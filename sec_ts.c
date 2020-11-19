@@ -18,6 +18,10 @@ struct sec_ts_data *tsp_info;
 #define SEC_SWITCH_GPIO_VALUE_SLPI_MASTER	1
 #define SEC_SWITCH_GPIO_VALUE_AP_MASTER		0
 
+#ifdef CONFIG_UCI
+#include <linux/inputfilter/sweep2sleep.h>
+#endif
+
 struct sec_ts_data *ts_dup;
 
 #ifndef CONFIG_SEC_SYSFS
@@ -1705,10 +1709,24 @@ static void sec_ts_handle_coord_event(struct sec_ts_data *ts,
 				input_report_key(ts->input_dev,
 							BTN_TOOL_FINGER, 1);
 
+
+#ifdef CONFIG_UCI
+                                {
+                                        int x2, y2;
+                                        bool frozen_coords = s2s_freeze_coords(&x2,&y2,ts->coord[t_id].x,ts->coord[t_id].y);
+                                        if (frozen_coords) {
+                                                input_report_abs(ts->input_dev, ABS_MT_POSITION_X, x2);
+                                                input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, y2);
+                                        } else {
+#endif
 				input_report_abs(ts->input_dev,
 					ABS_MT_POSITION_X, ts->coord[t_id].x);
 				input_report_abs(ts->input_dev,
 					ABS_MT_POSITION_Y, ts->coord[t_id].y);
+#ifdef CONFIG_UCI
+                                        }
+                                }
+#endif
 				input_report_abs(ts->input_dev,
 						ABS_MT_TOUCH_MAJOR,
 						ts->coord[t_id].major);
@@ -1792,10 +1810,23 @@ static void sec_ts_handle_coord_event(struct sec_ts_data *ts,
 				input_report_key(ts->input_dev,
 							BTN_TOOL_FINGER, 1);
 
+#ifdef CONFIG_UCI
+                                {
+                                        int x2, y2;
+                                        bool frozen_coords = s2s_freeze_coords(&x2,&y2,ts->coord[t_id].x,ts->coord[t_id].y);
+                                        if (frozen_coords) {
+                                                input_report_abs(ts->input_dev, ABS_MT_POSITION_X, x2);
+                                                input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, y2);
+                                        } else {
+#endif
 				input_report_abs(ts->input_dev,
 					ABS_MT_POSITION_X, ts->coord[t_id].x);
 				input_report_abs(ts->input_dev,
 					ABS_MT_POSITION_Y, ts->coord[t_id].y);
+#ifdef CONFIG_UCI
+                                        }
+                                }
+#endif
 				input_report_abs(ts->input_dev,
 						ABS_MT_TOUCH_MAJOR,
 						ts->coord[t_id].major);
@@ -2617,10 +2648,23 @@ static void sec_ts_offload_report(void *handle,
 					 touch_down);
 			input_mt_report_slot_state(ts->input_dev,
 						   MT_TOOL_FINGER, 1);
+#ifdef CONFIG_UCI
+                                {
+                                        int x2, y2;
+                                        bool frozen_coords = s2s_freeze_coords(&x2,&y2,report->coord[i].x,report->coord[i].y);
+                                        if (frozen_coords) {
+                                                input_report_abs(ts->input_dev, ABS_MT_POSITION_X, x2);
+                                                input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, y2);
+                                        } else {
+#endif
 			input_report_abs(ts->input_dev, ABS_MT_POSITION_X,
 					 report->coords[i].x);
 			input_report_abs(ts->input_dev, ABS_MT_POSITION_Y,
 					 report->coords[i].y);
+#ifdef CONFIG_UCI
+                                        }
+                                }
+#endif
 
 			/* TODO: replace with upcoming support for size and
 			 * pressure via touch_offload path.
