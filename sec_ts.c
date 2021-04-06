@@ -2708,7 +2708,7 @@ static void sec_ts_offload_report(void *handle,
 #ifdef CONFIG_UCI
                                 {
                                         int x2, y2;
-                                        bool frozen_coords = s2s_freeze_coords(&x2,&y2,report->coord[i].x,report->coord[i].y);
+                                        bool frozen_coords = s2s_freeze_coords(&x2,&y2,report->coords[i].x,report->coords[i].y);
                                         if (frozen_coords) {
                                                 input_report_abs(ts->input_dev, ABS_MT_POSITION_X, x2);
                                                 input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, y2);
