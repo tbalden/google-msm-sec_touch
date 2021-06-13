@@ -2688,13 +2688,21 @@ static void sec_ts_offload_report(void *handle,
 	input_set_timestamp(ts->input_dev, report->timestamp);
 
 	for (i = 0; i < MAX_COORDS; i++) {
-		if (report->coords[i].status == COORD_STATUS_FINGER) {
+		if (report->coords[i].status != COORD_STATUS_INACTIVE) {
+			int mt_tool = MT_TOOL_FINGER;
+
 			input_mt_slot(ts->input_dev, i);
 			touch_down = 1;
 			input_report_key(ts->input_dev, BTN_TOUCH,
 					 touch_down);
+
+			if (report->coords[i].status == COORD_STATUS_EDGE ||
+			    report->coords[i].status == COORD_STATUS_PALM ||
+			    report->coords[i].status == COORD_STATUS_CANCEL)
+				mt_tool = MT_TOOL_PALM;
+
 			input_mt_report_slot_state(ts->input_dev,
-						   MT_TOOL_FINGER, 1);
+						   mt_tool, 1);
 #ifdef CONFIG_UCI
                                 {
                                         int x2, y2;
